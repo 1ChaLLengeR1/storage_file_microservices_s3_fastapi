@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+celery
+redis
+pika
+http
+eventlet
+boto3
+sqlalchemy
