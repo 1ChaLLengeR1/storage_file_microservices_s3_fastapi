@@ -1,13 +1,16 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import os
+from decouple import config
 
-host = os.getenv("DB_HOST")
-port = os.getenv("DB_PORT")
-user = os.getenv("DB_USER")
-password = os.getenv("DB_PASSWORD")
-dbName = os.getenv("DB_DBNAME")
+host = config("DB_HOST")
+port = config("DB_PORT", cast=int)
+user = config("DB_USER")
+password = config("DB_PASSWORD")
+dbName = config("DB_DBNAME")
+
+if not all([host, port, user, password, dbName]):
+    raise ValueError("One or more database environment variables are missing.")
 
 data_base_url = f"postgresql://{user}:{password}@{host}:{port}/{dbName}"
 engine = create_engine(data_base_url)

@@ -3,7 +3,10 @@ uvicorn[standard]
 celery
 redis
 pika
-http
 eventlet
 boto3
 sqlalchemy
+alembic
+python-decouple
+psycopg2-binary
+
