@@ -1,5 +1,5 @@
 migration_up:
-	alembic downgrade base
+	alembic upgrade head
 
 migration_down:
-	alembic upgrade head
+	alembic downgrade base
