@@ -10,7 +10,7 @@ def test_database_connection():
             result = connection.execute(text("SELECT 1"))
             assert result.scalar() == 1
     except Exception as e:
-        pytest.fail(f"Połączenie do bazy danych nie powiodło się: {e}")
+        pytest.fail(f"Database connection failed: {e}")
 
 def test_db_session():
     try:
@@ -19,6 +19,6 @@ def test_db_session():
         result = db.execute(text("SELECT 1"))
         assert result.scalar() == 1
     except Exception as e:
-        pytest.fail(f"Połączenie do bazy danych nie powiodło się podczas używania sesji ORM: {e}")
+        pytest.fail(f"Database connection failed while using ORM session: {e}")
     finally:
         db.close()
