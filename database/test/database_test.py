@@ -11,6 +11,8 @@ def test_database_connection():
             assert result.scalar() == 1
     except Exception as e:
         pytest.fail(f"Database connection failed: {e}")
+    finally:
+        connection.close()
 
 def test_db_session():
     try:
