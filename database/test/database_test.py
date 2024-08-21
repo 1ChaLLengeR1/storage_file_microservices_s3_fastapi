@@ -1,11 +1,8 @@
 import pytest
 from sqlalchemy import text
-
-# Import funkcji i zmiennych z Twojego kodu
 from database.database import engine, SessionLocal
 def test_database_connection():
     try:
-        # Otwarcie połączenia bez użycia sesji ORM
         with engine.connect() as connection:
             result = connection.execute(text("SELECT 1"))
             assert result.scalar() == 1
@@ -16,7 +13,6 @@ def test_database_connection():
 
 def test_db_session():
     try:
-        # Otwarcie sesji ORM
         db = SessionLocal()
         result = db.execute(text("SELECT 1"))
         assert result.scalar() == 1

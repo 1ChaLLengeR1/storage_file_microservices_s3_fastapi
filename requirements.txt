@@ -9,4 +9,6 @@ sqlalchemy
 alembic
 python-decouple
 psycopg2-binary
+pytest
+pytest-asyncio
 
