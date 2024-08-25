@@ -1,29 +1,11 @@
-from fastapi import FastAPI, HTTPException, Depends, UploadFile
-from typing import Union
-from database.database import get_db
-from sqlalchemy.orm import Session
-from database.modals.Catalog.models import Catalog
-from config.s3_deps import s3_auth
-from botocore.client import BaseClient
+import uvicorn
+from fastapi import FastAPI
+from endpoints.api import api_router
 
 
+app = FastAPI(title="storage_file_microservices_s3_fastapi", description="Is a simple microservice for files, catalogs, videos and another files. This project it serves to faster build my own applications. ")
+app.include_router(api_router)
 
-app = FastAPI()
 
-@app.get("/catalogs")
-async def create_item(db: Session = Depends(get_db)):
-
-    catalogs = db.query(Catalog).all()
-    return catalogs
-
-@app.get("/bukets")
-def get_buckets(s3: BaseClient = Depends(s3_auth)):
-    response = s3.list_buckets()
-
-    return response['Buckets']
-@app.post("/uploadfile/")
-async def create_upload_file(file: Union[UploadFile, None] = None):
-    if not file:
-        return {"message": "No upload file sent"}
-    else:
-        return {"filename": file.filename}
+if __name__ == "__main__":
+    uvicorn.run(app, host="127.0.0.1", port=8000)

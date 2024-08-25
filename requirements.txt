@@ -11,4 +11,8 @@ python-decouple
 psycopg2-binary
 pytest
 pytest-asyncio
+pydantic-settings
+pydantic
+python-multipart
+
 

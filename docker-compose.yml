@@ -3,21 +3,25 @@ version: '3.8'
 services:
   app:
     build: .
-#    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     ports:
       - "8000:8000"
     depends_on:
       - redis
       - db
+      - rabbitmq
     volumes:
       - .:/app
     env_file:
       - .env
+    networks:
+      - app-network
 
   redis:
     image: redis:alpine
     ports:
       - "6379:6379"
+    networks:
+      - app-network
 
   db:
     image: postgres:13-alpine
@@ -29,6 +33,34 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - ${DB_PORT}:${DB_PORT}
+    networks:
+      - app-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - app-network
+
+  celery:
+    build: .
+    command: celery -A config.celery_config.app worker -l info -P eventlet
+    depends_on:
+      - redis
+      - db
+      - rabbitmq
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
+
+networks:
+  app-network:
+    driver: bridge

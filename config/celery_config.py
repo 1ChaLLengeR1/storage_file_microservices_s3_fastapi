@@ -6,3 +6,4 @@ app = Celery(
     backend='redis://localhost:6379/0'
 )
 
+app.conf.imports = ('consumer.services.s3.collection',)
