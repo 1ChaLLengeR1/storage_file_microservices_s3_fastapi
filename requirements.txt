@@ -14,5 +14,6 @@ pytest-asyncio
 pydantic-settings
 pydantic
 python-multipart
+passlib[bcrypt]
 
 

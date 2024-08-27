@@ -3,3 +3,6 @@ migration_up:
 
 migration_down:
 	alembic downgrade base
+
+migration_revision
+    alembic revision --autogenerate -m "new tables"

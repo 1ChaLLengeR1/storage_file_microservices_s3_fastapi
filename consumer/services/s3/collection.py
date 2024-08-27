@@ -9,7 +9,7 @@ def collection_buckets():
     return response['Buckets']
 
 @app.task
-def collection_catalogs(bucket_name, prefix):
+def collection_catalogs(bucket_name: str, prefix: str):
     s3 = s3_auth()
     paginator = s3.get_paginator('list_objects_v2')
 

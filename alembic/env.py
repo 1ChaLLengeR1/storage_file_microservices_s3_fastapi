@@ -2,7 +2,10 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
 from database.database import Base
-from database.modals.Catalog.models import Catalog  # Importuj swoje modele
+
+# Importuj swoje modele
+from database.modals.Catalog.models import Catalog
+from database.modals.Keys.models import Keys
 
 config = context.config
 
