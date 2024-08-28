@@ -47,4 +47,15 @@ async def test_authorization_main():
         pytest.fail(f"Error: {e}")
     finally:
         db.close()
+@pytest.mark.asyncio
+async def test_authorization_create_main():
+    db = SessionLocal()
+    try:
+        check_authorization_create = await authorization_create("test1", db)
+        assert check_authorization_create.verify
+        assert check_authorization_create.message == "Key is correct for main"
+    except Exception as e:
+        pytest.fail(f"Error: {e}")
+    finally:
+        db.close()
 
