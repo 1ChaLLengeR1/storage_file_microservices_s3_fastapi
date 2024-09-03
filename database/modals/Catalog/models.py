@@ -11,6 +11,7 @@ class Catalog(Base):
     name = Column(String)
     originalName = Column(String)
     path = Column(String)
+    url = Column(String)
     createUp = Column(DateTime, default=datetime.utcnow)
     updateUp = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

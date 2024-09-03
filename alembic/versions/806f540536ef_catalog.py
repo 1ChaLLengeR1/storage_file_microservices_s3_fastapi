@@ -26,6 +26,7 @@ def upgrade() -> None:
     sa.Column('name', sa.String(), nullable=True),
     sa.Column('originalName', sa.String(), nullable=True),
     sa.Column('path', sa.String(), nullable=True),
+    sa.Column('url', sa.String(), nullable=True),
     sa.Column('createUp', sa.DateTime(), nullable=True),
     sa.Column('updateUp', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
