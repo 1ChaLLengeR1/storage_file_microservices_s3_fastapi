@@ -10,25 +10,23 @@ router = APIRouter()
 async def get_task_status(task_id: str):
     task_result = app.AsyncResult(task_id)
 
-
-
-
     if task_result.state == 'PENDING':
         return {
             "status": "Pending",
-            "status_code": status.HTTP_202_ACCEPTED
+            "status_code": status.HTTP_202_ACCEPTED,
+            "result": None
         }
 
     elif task_result.state == 'SUCCESS':
         return {
-            "status": "success",
+            "status": "Success",
             "status_code": status.HTTP_200_OK,
-            "result":task_result.result
+            "result": task_result.result
         }
 
     elif task_result.state == 'FAILURE':
         return {
-            "status": "failure",
+            "status": "Failure",
             "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
             "result": task_result.result
         }
