@@ -8,7 +8,7 @@ app = Celery(
 
 app.conf.update(
     result_expires=120,
-    imports=('consumer.services.s3.collection', 'consumer.services.s3.create', 'consumer.handler.catalog.create'),
+    imports=('consumer.services.s3.collection', 'consumer.services.s3.create', 'consumer.handler.catalog.create', 'consumer.handler.catalog.collection'),
     accept_content = ['application/json', 'json', 'pickle'],
     result_serializer = 'pickle',
     task_serializer = 'pickle'

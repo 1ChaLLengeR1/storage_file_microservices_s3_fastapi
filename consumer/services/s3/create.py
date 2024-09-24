@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from typing import Optional
 from consumer.helper.convert import original_name_from_path
 
+
 class S3CatalogResponse(BaseModel):
     catalog_name: Optional[str] = None
     catalog_url: Optional[str] = None
@@ -20,7 +21,6 @@ def create_catalog(bucket_name: str, name_catalog: str) -> S3CatalogResponse:
             catalog_path = f"{name_catalog}/"
         else:
             catalog_path = name_catalog
-
 
         response = s3.list_objects_v2(Bucket=bucket_name, Prefix=catalog_path)
         if 'Contents' in response:

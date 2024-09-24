@@ -1,26 +1,11 @@
 from database.database import get_db
 from database.modals.Catalog.models import Catalog
-from pydantic import BaseModel
-from typing import Optional
-from datetime import datetime
 from sqlalchemy.exc import SQLAlchemyError
-
+from .data.create import HandlerCatalogResponse
 from consumer.services.s3.create import create_catalog
 from config.celery_config import app
 from consumer.helper.random import createRandom
 from consumer.handler.authorization.authorization import authorization_create
-
-
-class HandlerCatalogResponse(BaseModel):
-    id: Optional[str] = None
-    bucketName: Optional[str] = None
-    name: Optional[str] = None
-    originalName: Optional[str] = None
-    path: Optional[str] = None
-    url: Optional[str] = None
-    error: Optional[str] = None
-    createUp: Optional[datetime] = None
-    updateUp: Optional[datetime] = None
 
 
 @app.task(serializer="pickle")
