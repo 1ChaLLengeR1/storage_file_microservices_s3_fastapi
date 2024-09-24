@@ -1,12 +1,14 @@
 import boto3
-from botocore.client import BaseClient
+from botocore.client import BaseClient, Config
 
 from config.s3_settings import settings
 
 
 def s3_auth() -> BaseClient:
     s3 = boto3.client(service_name='s3', aws_access_key_id=settings.AWS_SERVER_PUBLIC_KEY,
-                      aws_secret_access_key=settings.AWS_SERVER_SECRET_KEY
+                      aws_secret_access_key=settings.AWS_SERVER_SECRET_KEY,
+                      region_name=settings.AWS_DEFAULT_REGION,
+                      config=Config(signature_version='s3v4')
                       )
 
     return s3

@@ -2,11 +2,24 @@ from config.celery_config import app
 from config.s3_deps import s3_auth
 from urllib.parse import quote_plus
 
+
+@app.task
+def collection_one(bucket_name: str, name_file: str) -> str:
+    s3 = s3_auth()
+    object_key = name_file
+    url = s3.generate_presigned_url('get_object',
+                                    Params={'Bucket': bucket_name, 'Key': object_key},
+                                    ExpiresIn=3600)
+
+    return url
+
+
 @app.task
 def collection_buckets():
     s3 = s3_auth()
     response = s3.list_buckets()
     return response['Buckets']
+
 
 @app.task
 def collection_catalogs(bucket_name: str, prefix: str):
