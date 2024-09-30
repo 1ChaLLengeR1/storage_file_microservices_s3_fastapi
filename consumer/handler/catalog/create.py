@@ -5,6 +5,7 @@ from .data.create import HandlerCatalogResponse
 from consumer.services.s3.create import create_catalog
 from config.celery_config import app
 from consumer.helper.random import createRandom
+from consumer.helper.convert import path_lvl
 from consumer.handler.authorization.authorization import authorization_create
 
 
@@ -30,7 +31,8 @@ def handler_create_catalog(bucket_name: str, name_catalog: str, key_create: str)
             name=createRandom(create_catalog_3.catalog_name, 10),
             originalName=create_catalog_3.catalog_name,
             path=create_catalog_3.catalog_path,
-            url=create_catalog_3.catalog_url
+            url=create_catalog_3.catalog_url,
+            level=path_lvl(name_catalog)
         )
 
         db.add(new_catalog)
@@ -44,6 +46,7 @@ def handler_create_catalog(bucket_name: str, name_catalog: str, key_create: str)
             originalName=new_catalog.originalName,
             path=new_catalog.path,
             url=new_catalog.url,
+            level=new_catalog.level,
             createUp=new_catalog.createUp,
             updateUp=new_catalog.updateUp
         )

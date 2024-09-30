@@ -1,7 +1,8 @@
-from sqlalchemy import Column, String, DateTime
+from sqlalchemy import Column, String, DateTime, Integer
 import uuid
 from datetime import datetime
 from database.database import Base
+
 
 class Catalog(Base):
     __tablename__ = "catalog"
@@ -12,6 +13,7 @@ class Catalog(Base):
     originalName = Column(String)
     path = Column(String)
     url = Column(String)
+    level = Column(Integer)
     createUp = Column(DateTime, default=datetime.utcnow)
     updateUp = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
