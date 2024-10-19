@@ -11,6 +11,5 @@ class HandlerCatalogResponse(BaseModel):
     path: Optional[str] = None
     url: Optional[str] = None
     level: Optional[int] = None
-    error: Optional[str] = None
     createUp: Optional[datetime] = None
     updateUp: Optional[datetime] = None

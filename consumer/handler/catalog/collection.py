@@ -1,9 +1,8 @@
 from database.database import get_db
 from database.modals.Catalog.models import Catalog
-from pydantic import BaseModel
 from config.celery_config import app
 from sqlalchemy.exc import SQLAlchemyError
-from .data.create import HandlerCatalogResponse
+from consumer.data.error import ResponseError
 
 
 @app.task(serializer="pickle")
@@ -14,6 +13,10 @@ def handler_collection_catalog():
         db = next(db_gen)
 
         data = db.query(Catalog).all()
+
+        if len(data) == 0:
+            return ResponseError(error="lack catalogs")
+
         sorted_data = sorted(data, key=lambda x: x.path)
 
         folder_tree = {}
@@ -48,10 +51,10 @@ def handler_collection_catalog():
 
     except SQLAlchemyError as e:
         db.rollback()
-        return HandlerCatalogResponse(error=f"Database error: {str(e)}")
+        return ResponseError(error=f"Database error: {str(e)}")
 
     except Exception as e:
-        return HandlerCatalogResponse(error=str(e))
+        return ResponseError(error=f"{str(e)}")
 
     finally:
         db.close()

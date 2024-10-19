@@ -2,6 +2,7 @@ from database.database import get_db
 from database.modals.Catalog.models import Catalog
 from sqlalchemy.exc import SQLAlchemyError
 from .data.create import HandlerCatalogResponse
+from consumer.data.error import ResponseError
 from consumer.services.s3.create import create_catalog
 from config.celery_config import app
 from consumer.helper.random import createRandom
@@ -10,7 +11,8 @@ from consumer.handler.authorization.authorization import authorization_create
 
 
 @app.task(serializer="pickle")
-def handler_create_catalog(bucket_name: str, name_catalog: str, key_create: str) -> HandlerCatalogResponse:
+def handler_create_catalog(bucket_name: str, name_catalog: str,
+                           key_create: str) -> HandlerCatalogResponse or ResponseError:
     db_gen = get_db()
     db = next(db_gen)
 
@@ -18,13 +20,13 @@ def handler_create_catalog(bucket_name: str, name_catalog: str, key_create: str)
 
         check_authorization = authorization_create(key_create, db)
         if not check_authorization.verify:
-            return HandlerCatalogResponse(error=check_authorization.message)
+            return ResponseError(error=check_authorization.message)
 
         original_name_catalog: str = name_catalog
 
         create_catalog_3 = create_catalog(bucket_name, original_name_catalog)
         if create_catalog_3.error:
-            return HandlerCatalogResponse(error=str(create_catalog_3.error))
+            return ResponseError(error=str(create_catalog_3.error))
 
         new_catalog = Catalog(
             bucketName=bucket_name,
@@ -47,17 +49,17 @@ def handler_create_catalog(bucket_name: str, name_catalog: str, key_create: str)
             path=new_catalog.path,
             url=new_catalog.url,
             level=new_catalog.level,
-            createUp=new_catalog.createUp,
-            updateUp=new_catalog.updateUp
+            createUp=str(new_catalog.createUp),
+            updateUp=str(new_catalog.updateUp)
         )
 
 
     except SQLAlchemyError as e:
         db.rollback()
-        return HandlerCatalogResponse(error=f"Database error: {str(e)}")
+        return ResponseError(error=f"Database error: {str(e)}")
 
     except Exception as e:
-        return HandlerCatalogResponse(error=str(e))
+        return ResponseError(error=str(e))
 
     finally:
         db.close()
