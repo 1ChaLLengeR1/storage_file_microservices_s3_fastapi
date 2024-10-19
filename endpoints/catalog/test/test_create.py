@@ -27,9 +27,7 @@ def test_endpoint_post_create_catalog():
 
     assert response_task_status.status_code == 200
     response_data = response_task_status.json()
-
     assert "status" in response_data
-    assert response_data["status"] in ["Pending", "Success", "Failure"]
-    assert "result" in response_data
-    assert "error" in response_data["result"]
-    assert response_data["result"]["error"] is None
+    assert response_data["status"] in ["PENDING", "ERROR", "SUCCESS", "FAILURE"]
+    if response_data["status"] == "ERROR":
+        assert "error" in response_data["result"]

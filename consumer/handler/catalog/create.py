@@ -8,11 +8,12 @@ from config.celery_config import app
 from consumer.helper.random import createRandom
 from consumer.helper.convert import path_lvl
 from consumer.handler.authorization.authorization import authorization_create
+from typing import Union
 
 
 @app.task(serializer="pickle")
 def handler_create_catalog(bucket_name: str, name_catalog: str,
-                           key_create: str) -> HandlerCatalogResponse or ResponseError:
+                           key_create: str) -> Union[HandlerCatalogResponse, ResponseError]:
     db_gen = get_db()
     db = next(db_gen)
 
