@@ -3,19 +3,24 @@ from database.modals.Catalog.models import Catalog
 from config.celery_config import app
 from sqlalchemy.exc import SQLAlchemyError
 from consumer.data.error import ResponseError
+from consumer.handler.authorization.authorization import authorization_main
 
 
 @app.task(serializer="pickle")
-def handler_collection_catalog():
+def handler_collection_catalog(name_bucket: str, key_main: str):
     try:
 
         db_gen = get_db()
         db = next(db_gen)
 
-        data = db.query(Catalog).all()
+        check_authorization = authorization_main(key_main, db)
+        if not check_authorization.verify:
+            return ResponseError(error=check_authorization.message)
+
+        data = db.query(Catalog).filter(Catalog.bucketName == name_bucket).all()
 
         if len(data) == 0:
-            return ResponseError(error="lack catalogs")
+            return ResponseError(error="lack catalogs or s3 storage not exist")
 
         sorted_data = sorted(data, key=lambda x: x.path)
 
