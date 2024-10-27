@@ -12,16 +12,20 @@ from consumer.handler.authorization.authorization import authorization_create
 
 @app.task(serializer="pickle")
 def handler_create_catalog(bucket_name: str, name_catalog: str, key_create: str):
-    db_gen = get_db()
-    db = next(db_gen)
-
     try:
+
+        db_gen = get_db()
+        db = next(db_gen)
 
         check_authorization = authorization_create(key_create, db)
         if not check_authorization.verify:
             return ResponseError(error=check_authorization.message)
 
         original_name_catalog: str = name_catalog
+
+        data = db.query(Catalog).filter(Catalog.originalName == original_name_catalog).first()
+        if data:
+            return ResponseError(error="catalog exist in database")
 
         create_catalog_3 = create_catalog(bucket_name, original_name_catalog)
         if create_catalog_3.error:

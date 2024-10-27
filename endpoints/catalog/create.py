@@ -1,14 +1,19 @@
-from fastapi import APIRouter, BackgroundTasks, Request
+from fastapi import APIRouter, BackgroundTasks, Request, status
 from endpoints.routers import CREATE_CATALOG
 from fastapi.responses import JSONResponse
 from consumer.handler.catalog.create import handler_create_catalog
 from pydantic import BaseModel
+from celery.result import AsyncResult
+import time
+import asyncio
 
 router = APIRouter()
+
 
 class CreateCatalog(BaseModel):
     catalog_name: str
     bucket_name: str
+
 
 @router.post(CREATE_CATALOG)
 async def post_create_catalog(background_tasks: BackgroundTasks, create_catalog_s3: CreateCatalog, request: Request):
@@ -20,5 +25,35 @@ async def post_create_catalog(background_tasks: BackgroundTasks, create_catalog_
         )
 
     task = handler_create_catalog.delay(create_catalog_s3.bucket_name, create_catalog_s3.catalog_name, key_create)
+
+    timeout = 10
+    start_time = time.time()
+    try:
+        while (time.time() - start_time) < timeout:
+            task_result = AsyncResult(task.id)
+            if task_result.state == 'SUCCESS':
+                return {
+                    "status": "SUCCESS",
+                    "status_code": status.HTTP_200_OK,
+                    "result": task_result.result
+                }
+            elif task_result.state == 'FAILURE':
+                return {
+                    "status": "FAILURE",
+                    "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "result": task_result.result
+                }
+            await asyncio.sleep(0.5)
+    except Exception as e:
+        return {
+            "status": "FAILURE",
+            "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+            "result": {"error": str(e)}
+        }
+
     background_tasks.add_task(task.wait)
-    return {"task_id": task.id}
+    return {
+        "status": "PENDING",
+        "status_code": status.HTTP_202_ACCEPTED,
+        "result": {"task_id": task.id}
+    }

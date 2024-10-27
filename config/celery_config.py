@@ -1,3 +1,6 @@
+import eventlet
+eventlet.monkey_patch()
+
 from celery import Celery
 
 app = Celery(
@@ -12,5 +15,6 @@ app.conf.update(
              'consumer.handler.catalog.collection', 'consumer.handler.catalog.collection_one'),
     accept_content=['application/json', 'json', 'pickle'],
     result_serializer='pickle',
+    broker_connection_retry_on_startup=True,
     task_serializer='pickle'
 )

@@ -24,7 +24,7 @@ def create_catalog(bucket_name: str, name_catalog: str) -> S3CatalogResponse:
 
         response = s3.list_objects_v2(Bucket=bucket_name, Prefix=catalog_path)
         if 'Contents' in response:
-            return S3CatalogResponse(error="Folder already exists")
+            return S3CatalogResponse(error="Folder already exists in S3")
 
         s3.put_object(Bucket=bucket_name, Key=catalog_path)
         catalog_url = f"https://{bucket_name}.s3.amazonaws.com/{quote_plus(catalog_path)}"
