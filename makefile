@@ -14,4 +14,4 @@ run_worker:
 	celery -A config.celery_config.app worker -P eventlet --loglevel=info
 
 run_app:
-	uvicorn main:app --reload --log-level debug
+	uvicorn main:app --reload --log-level debug --port 7000

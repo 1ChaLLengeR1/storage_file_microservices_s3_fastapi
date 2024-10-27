@@ -3,6 +3,7 @@ uvicorn[standard]
 celery
 redis
 pika
+redis
 eventlet
 boto3
 sqlalchemy
