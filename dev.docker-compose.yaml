@@ -2,6 +2,51 @@ version: '3.8'
 
 
 services:
+  redis_backend_microservice:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+  rabbitmq_backend_microservice:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"
+    expose:
+      - "15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  db_postgresql_microservice:
+    image: postgres
+    restart: always
+    env_file:
+      - ./.env
+    environment:
+      POSTGRES_DB: ${DB_DBNAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+
+  celery_worker_microservice:
+    build:
+      context: .
+      dockerfile: Dockerfiles/dev.dockerfile
+    env_file:
+      - ./.env
+    environment:
+      REDIS_HOST: 'redis'
+      REDIS_PORT: '6379'
+      BROKER_URL: 'pyamqp://guest:guest@rabbitmq_backend_microservice//'
+      RESULT_BACKEND: 'redis://redis_backend_microservice:6379/0'
+      C_FORCE_ROOT: '1'
+      CELERY_BROKER_CONNECTION_RETRY: 'True'
+      CELERY_BROKER_CONNECTION_MAX_RETRIES: '100'
+    command: [ "celery", "-A", "config.celery_config.app", "worker", "-P", "eventlet", "--loglevel=info" ]
+    volumes:
+      - .:/app
+
   fastapi_backend_microservice:
     build:
       context: .
@@ -18,53 +63,14 @@ services:
       DB_DBNAME: ${DB_DBNAME}
     volumes:
       - .:/app
-
     depends_on:
       - db_postgresql_microservice
       - redis_backend_microservice
       - rabbitmq_backend_microservice
 
-  db_postgresql_microservice:
-    image: postgres
-    restart: always
-    env_file:
-      - ./.env
-    environment:
-      POSTGRES_DB: ${DB_DBNAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "5432:5432"
 
-  redis_backend_microservice:
-    image: redis:latest
-    ports:
-      - "6379:6379"
 
-  rabbitmq_backend_microservice:
-    image: rabbitmq:3-management
-    ports:
-      - "15672:15672"
-    expose:
-      - "15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
 
-  celery_worker_microservice:
-    build:
-      context: .
-      dockerfile: Dockerfiles/dev.dockerfile
-    env_file:
-      - ./.env
-    environment:
-      BROKER_URL: 'pyamqp://guest:guest@rabbitmq_backend_microservice//'
-      RESULT_BACKEND: 'redis://redis_backend_microservice:6379/0'
-      C_FORCE_ROOT: '1'
-      CELERY_BROKER_CONNECTION_RETRY: 'True'
-      CELERY_BROKER_CONNECTION_MAX_RETRIES: '100'
-    command: [ "celery", "-A", "config.celery_config.app", "worker", "-P", "eventlet", "--loglevel=info" ]
-    volumes:
-      - .:/app
-    depends_on:
-      - fastapi_backend_microservice
+
+
+

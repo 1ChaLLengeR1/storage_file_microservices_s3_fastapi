@@ -1,4 +1,6 @@
+import pickle
 from database.database import get_db
+from config.redis_client import redis_client
 from database.modals.Catalog.models import Catalog
 from config.celery_config import app
 from sqlalchemy.exc import SQLAlchemyError
@@ -8,6 +10,11 @@ from consumer.handler.authorization.authorization import authorization_main
 
 @app.task(serializer="pickle")
 def handler_collection_catalog(name_bucket: str, key_main: str):
+    cache_key = f"collection_catalog"
+    cached_data = redis_client.get(cache_key)
+    if cached_data:
+        return pickle.loads(cached_data)
+
     try:
 
         db_gen = get_db()
@@ -51,8 +58,9 @@ def handler_collection_catalog(name_bucket: str, key_main: str):
                 "subfolders": {}
             }
 
-        return folder_tree
+        redis_client.set(cache_key, pickle.dumps(folder_tree), ex=300)
 
+        return folder_tree
 
     except SQLAlchemyError as e:
         db.rollback()

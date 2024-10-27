@@ -2,6 +2,7 @@ from database.database import get_db
 from database.modals.Catalog.models import Catalog
 from sqlalchemy.exc import SQLAlchemyError
 from .data.create import HandlerCatalogResponse
+from consumer.helper.convert import original_name_from_path
 from consumer.data.error import ResponseError
 from consumer.services.s3.create import create_catalog
 from config.celery_config import app
@@ -22,8 +23,9 @@ def handler_create_catalog(bucket_name: str, name_catalog: str, key_create: str)
             return ResponseError(error=check_authorization.message)
 
         original_name_catalog: str = name_catalog
+        check_name = original_name_from_path(original_name_catalog)
 
-        data = db.query(Catalog).filter(Catalog.originalName == original_name_catalog).first()
+        data = db.query(Catalog).filter(Catalog.originalName == check_name).first()
         if data:
             return ResponseError(error="catalog exist in database")
 

@@ -1,15 +1,11 @@
 import pickle
-import redis
-import logging
+from config.redis_client import redis_client
 from database.database import get_db
 from database.modals.Catalog.models import Catalog
 from config.celery_config import app
 from sqlalchemy.exc import SQLAlchemyError
 from consumer.data.error import ResponseError
 from consumer.handler.authorization.authorization import authorization_main
-
-redis_client = redis.Redis(host='localhost', port=6379, db=0)
-
 
 @app.task(serializer="pickle")
 def handler_collection_one_catalog(catalog_id: str, key_main: str):

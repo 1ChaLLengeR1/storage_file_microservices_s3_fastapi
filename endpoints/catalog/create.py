@@ -1,4 +1,4 @@
-from fastapi import APIRouter, BackgroundTasks, Request, status
+from fastapi import APIRouter, BackgroundTasks, Request, status, Response
 from endpoints.routers import CREATE_CATALOG
 from fastapi.responses import JSONResponse
 from consumer.handler.catalog.create import handler_create_catalog
@@ -16,7 +16,8 @@ class CreateCatalog(BaseModel):
 
 
 @router.post(CREATE_CATALOG)
-async def post_create_catalog(background_tasks: BackgroundTasks, create_catalog_s3: CreateCatalog, request: Request):
+async def post_create_catalog(background_tasks: BackgroundTasks, create_catalog_s3: CreateCatalog, request: Request,
+                              response: Response):
     key_create = request.headers.get("key_create")
     if not key_create:
         return JSONResponse(
@@ -32,15 +33,18 @@ async def post_create_catalog(background_tasks: BackgroundTasks, create_catalog_
         while (time.time() - start_time) < timeout:
             task_result = AsyncResult(task.id)
             if task_result.state == 'SUCCESS':
+                if hasattr(task_result.result, 'error') and task_result.result.error:
+                    response.status_code = status.HTTP_400_BAD_REQUEST
+                    return {
+                        "status": "ERROR",
+                        "status_code": status.HTTP_400_BAD_REQUEST,
+                        "result": task_result.result
+                    }
+
+                response.status_code = status.HTTP_200_OK
                 return {
                     "status": "SUCCESS",
                     "status_code": status.HTTP_200_OK,
-                    "result": task_result.result
-                }
-            elif task_result.state == 'FAILURE':
-                return {
-                    "status": "FAILURE",
-                    "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
                     "result": task_result.result
                 }
             await asyncio.sleep(0.5)
