@@ -9,6 +9,7 @@ from config.celery_config import app
 from consumer.helper.random import createRandom
 from consumer.helper.convert import path_lvl
 from consumer.handler.authorization.authorization import authorization_create
+from config.redis_client import delete_cache_by_prefix
 
 
 @app.task(serializer="pickle")
@@ -45,6 +46,8 @@ def handler_create_catalog(bucket_name: str, name_catalog: str, key_create: str)
         db.add(new_catalog)
         db.commit()
         db.refresh(new_catalog)
+
+        delete_cache_by_prefix("collection_catalog_")
 
         return HandlerCatalogResponse(
             id=new_catalog.id,

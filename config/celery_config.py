@@ -1,14 +1,13 @@
+from consumer.helper.validators import get_env_variable
+from celery import Celery
 import eventlet
 eventlet.monkey_patch()
 
-from celery import Celery
 
 app = Celery(
     'storage_file_microservices_s3_fastapi',
-    # broker='pyamqp://guest@localhost//', #za pomocą lokalnie
-    # backend='redis://localhost:6379/0' #za pomocą lokalnie
-    broker='pyamqp://guest@rabbitmq_backend_microservice//',
-    backend='redis://redis_backend_microservice:6379/0'
+    broker=get_env_variable("BROKER"),
+    backend=get_env_variable("BACKEND")
 )
 
 app.conf.update(

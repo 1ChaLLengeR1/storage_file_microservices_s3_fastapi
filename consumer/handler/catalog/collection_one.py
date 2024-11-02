@@ -1,5 +1,4 @@
-import pickle
-from config.redis_client import redis_client
+from config.redis_client import get_cache_data, set_cache_data
 from database.database import get_db
 from database.modals.Catalog.models import Catalog
 from config.celery_config import app
@@ -9,10 +8,11 @@ from consumer.handler.authorization.authorization import authorization_main
 
 @app.task(serializer="pickle")
 def handler_collection_one_catalog(catalog_id: str, key_main: str):
+
     cache_key = f"catalog_{catalog_id}"
-    cached_data = redis_client.get(cache_key)
+    cached_data = get_cache_data(cache_key)
     if cached_data:
-        return pickle.loads(cached_data)
+        return cached_data
 
     try:
         db_gen = get_db()
@@ -52,8 +52,7 @@ def handler_collection_one_catalog(catalog_id: str, key_main: str):
             "sub_catalogs": sub_catalog_list
         }
 
-        redis_client.set(cache_key, pickle.dumps(result), ex=300)
-
+        set_cache_data(cache_key, result)
         return result
 
     except SQLAlchemyError as e:
