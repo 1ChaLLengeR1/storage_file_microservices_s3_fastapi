@@ -26,7 +26,12 @@ def handler_create_catalog(bucket_name: str, name_catalog: str, key_create: str)
         original_name_catalog: str = name_catalog
         check_name = original_name_from_path(original_name_catalog)
 
-        data = db.query(Catalog).filter(Catalog.originalName == check_name).first()
+        if not name_catalog.endswith('/'):
+            catalog_path = f"{name_catalog}/"
+        else:
+            catalog_path = name_catalog
+
+        data = db.query(Catalog).filter(Catalog.originalName == check_name, Catalog.path == catalog_path).first()
         if data:
             return ResponseError(error="catalog exist in database")
 

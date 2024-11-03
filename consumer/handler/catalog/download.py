@@ -4,15 +4,19 @@ from config.celery_config import app
 from sqlalchemy.exc import SQLAlchemyError
 from consumer.data.error import ResponseError
 from consumer.handler.authorization.authorization import authorization_main
-from consumer.services.s3.delete import delete_catalog
-from config.redis_client import delete_cache_by_prefix
+from consumer.services.s3.download import download_s3_catalog
+
+from config.config_app import DOWNLOAD_FOLDER
+from consumer.helper.files import create_catalog_folder, zip_catalog
 
 
 @app.task(serializer="pickle")
-def handler_delete_catalog(catalog_id: str, bucket_name: str, key_main: str):
+def handler_download_catalog(catalog_id: str, bucket_name: str, key_main: str):
     try:
         db_gen = get_db()
         db = next(db_gen)
+
+        paths = []
 
         check_authorization = authorization_main(key_main, db)
         if not check_authorization.verify:
@@ -22,24 +26,24 @@ def handler_delete_catalog(catalog_id: str, bucket_name: str, key_main: str):
         if not catalog:
             return ResponseError(error="catalog id is not exist in database")
 
-        path_to_delete = catalog.path
-        related_catalogs = db.query(Catalog).filter(Catalog.path.like(f"{path_to_delete}%")).all()
-
-        unique_levels = {cat.level for cat in related_catalogs}
-        min_level = min(unique_levels, default=None)
-
-        catalog_main = next((cat for cat in related_catalogs if cat.level == min_level), None)
-
-        delete_catalog_s3 = delete_catalog(bucket_name, catalog_main.path)
-        if delete_catalog_s3.error:
-            return {"error": delete_catalog_s3}
+        path_to_download = catalog.path
+        related_catalogs = db.query(Catalog).filter(Catalog.path.like(f"{path_to_download}%")).all()
 
         for related_catalog in related_catalogs:
-            db.delete(related_catalog)
+            catalog_name = related_catalog.originalName
+            catalog_path = related_catalog.path
+            paths.append({
+                "name": catalog_name,
+                "path": catalog_path
+            })
 
-        db.commit()
-        delete_cache_by_prefix("catalog_")
-        return related_catalogs
+            download_s3_catalog(bucket_name, catalog_path)
+
+        if paths:
+            main_catalog_path = DOWNLOAD_FOLDER / paths[0]['path']
+            zip_file_path = f"{zip_catalog(main_catalog_path)}.zip"
+
+        return {"success": "Download Successful", "zip_file": str(zip_file_path)}
 
 
     except SQLAlchemyError as e:

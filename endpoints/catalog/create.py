@@ -1,4 +1,4 @@
-from fastapi import APIRouter, BackgroundTasks, Request, status, Response
+from fastapi import APIRouter, BackgroundTasks, Request, Response
 from endpoints.routers import CREATE_CATALOG
 from fastapi.responses import JSONResponse
 from consumer.handler.catalog.create import handler_create_catalog
