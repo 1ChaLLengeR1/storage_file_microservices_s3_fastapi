@@ -17,7 +17,6 @@ def download_s3_catalog(bucket_name: str, path_catalog: str) -> S3CatalogRespons
         if 'Contents' in response:
             local_folder = os.path.join(DOWNLOAD_FOLDER, path_catalog)
             os.makedirs(local_folder, exist_ok=True)
-
             for obj in response['Contents']:
                 s3_object_key = obj['Key']
                 if not s3_object_key.endswith('/'):

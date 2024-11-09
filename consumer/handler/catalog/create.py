@@ -7,7 +7,7 @@ from consumer.data.error import ResponseError
 from consumer.services.s3.create import create_catalog
 from config.celery_config import app
 from consumer.helper.random import createRandom
-from consumer.helper.convert import path_lvl
+from consumer.helper.convert import path_lvl, split_path
 from consumer.handler.authorization.authorization import authorization_create
 from config.redis_client import delete_cache_by_prefix
 
@@ -24,48 +24,52 @@ def handler_create_catalog(bucket_name: str, name_catalog: str, key_create: str)
             return ResponseError(error=check_authorization.message)
 
         original_name_catalog: str = name_catalog
-        check_name = original_name_from_path(original_name_catalog)
 
-        if not name_catalog.endswith('/'):
-            catalog_path = f"{name_catalog}/"
-        else:
-            catalog_path = name_catalog
+        split_paths = split_path(original_name_catalog)
+        catalog_records = db.query(Catalog).filter(Catalog.path.in_(split_paths)).all()
+        last_path = split_paths[-1]
+        created_catalogs = []
 
-        data = db.query(Catalog).filter(Catalog.originalName == check_name, Catalog.path == catalog_path).first()
-        if data:
-            return ResponseError(error="catalog exist in database")
+        for index, catalog in enumerate(catalog_records):
+            if catalog.path == last_path:
+                return ResponseError(error="catalog exist in database")
 
-        create_catalog_3 = create_catalog(bucket_name, original_name_catalog)
-        if create_catalog_3.error:
-            return ResponseError(error=str(create_catalog_3.error))
+        existing_paths = {record.path for record in catalog_records}
+        for path in split_paths:
+            if path in existing_paths:
+                continue
+            else:
+                create_catalog_3 = create_catalog(bucket_name, path)
+                if create_catalog_3.error:
+                    return ResponseError(error=str(create_catalog_3.error))
 
-        new_catalog = Catalog(
-            bucketName=bucket_name,
-            name=createRandom(create_catalog_3.catalog_name, 10),
-            originalName=create_catalog_3.catalog_name,
-            path=create_catalog_3.catalog_path,
-            url=create_catalog_3.catalog_url,
-            level=path_lvl(name_catalog)
-        )
+                new_catalog = Catalog(
+                    bucketName=bucket_name,
+                    name=createRandom(create_catalog_3.catalog_name, 10),
+                    originalName=create_catalog_3.catalog_name,
+                    path=create_catalog_3.catalog_path,
+                    url=create_catalog_3.catalog_url,
+                    level=path_lvl(path)
+                )
 
-        db.add(new_catalog)
-        db.commit()
-        db.refresh(new_catalog)
+                db.add(new_catalog)
+                db.commit()
+                db.refresh(new_catalog)
+                created_catalogs.append(new_catalog)
 
         delete_cache_by_prefix("collection_catalog_")
 
-        return HandlerCatalogResponse(
-            id=new_catalog.id,
-            bucketName=new_catalog.bucketName,
-            name=new_catalog.name,
-            originalName=new_catalog.originalName,
-            path=new_catalog.path,
-            url=new_catalog.url,
-            level=new_catalog.level,
-            createUp=str(new_catalog.createUp),
-            updateUp=str(new_catalog.updateUp)
-        )
-
+        return [HandlerCatalogResponse(
+            id=catalog.id,
+            bucketName=catalog.bucketName,
+            name=catalog.name,
+            originalName=catalog.originalName,
+            path=catalog.path,
+            url=catalog.url,
+            level=catalog.level,
+            createUp=str(catalog.createUp),
+            updateUp=str(catalog.updateUp)
+        ) for catalog in created_catalogs]
 
     except SQLAlchemyError as e:
         db.rollback()

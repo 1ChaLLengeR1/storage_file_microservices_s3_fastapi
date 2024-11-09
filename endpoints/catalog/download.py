@@ -33,6 +33,6 @@ async def download_catalog(background_tasks: BackgroundTasks, id: str, request: 
     if response.get("status") == "SUCCESS":
         zip_file_path = response["result"].get("zip_file")
         if zip_file_path and os.path.exists(zip_file_path):
-            return FileResponse(path=zip_file_path, media_type='application/zip', filename="storage_s3_files")
+            return FileResponse(path=zip_file_path, media_type='application/zip', filename="storage_s3_files.zip")
 
     return response
