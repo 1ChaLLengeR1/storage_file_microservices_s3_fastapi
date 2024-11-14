@@ -5,34 +5,46 @@ from consumer.handler.catalog.download import handler_download_catalog
 from endpoints.response import response_data
 import time
 import os
+from consumer.helper.header import check_required_headers
+from consumer.data.response import ResponseApiData
 
 router = APIRouter()
 
 
 @router.get(DOWNLOAD_CATALOG)
-async def download_catalog(background_tasks: BackgroundTasks, id: str, request: Request, response: Response):
+async def download_catalog(background_tasks: BackgroundTasks, id: str, request: Request):
     bucket_name = request.query_params.get("bucket_name")
     if not bucket_name:
-        return JSONResponse(
-            status_code=400,
-            content={"error": "Missing 'bucket_name' in query parameters"}
-        )
+        if not bucket_name:
+            return ResponseApiData(
+                status="ERROR",
+                data={"error": "Missing 'bucket_name' in query parameters"},
+                status_code=400
+            ).to_response()
 
-    key_main = request.headers.get("key_main")
-    if not key_main:
-        return JSONResponse(
-            status_code=400,
-            content={"error": "Missing 'key_main' in headers"}
-        )
+    required_headers = ["key_main"]
+    data_header = check_required_headers(request, required_headers)
+    if not data_header['is_valid']:
+        return ResponseApiData(
+            status="ERROR",
+            data=data_header['data'],
+            status_code=data_header['status_code']
+        ).to_response()
+
+    key_main = data_header['data'][0]['data']
 
     task = handler_download_catalog.delay(id, bucket_name, key_main)
     timeout = 10
     start_time = time.time()
-    response = await response_data(background_tasks, task, timeout, start_time, response)
+    response = await response_data(background_tasks, task, timeout, start_time)
 
     if response.get("status") == "SUCCESS":
-        zip_file_path = response["result"].get("zip_file")
+        zip_file_path = response["data"].get("zip_file")
         if zip_file_path and os.path.exists(zip_file_path):
             return FileResponse(path=zip_file_path, media_type='application/zip', filename="storage_s3_files.zip")
 
-    return response
+    return ResponseApiData(
+        status=response["status"],
+        data=response["data"],
+        status_code=response["status_code"]
+    ).to_response()

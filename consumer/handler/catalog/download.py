@@ -57,6 +57,7 @@ def handler_download_catalog(catalog_id: str, bucket_name: str, key_main: str):
     finally:
         db.close()
 
+
 @app.task(serializer="pickle")
 def clean_up_task(directory):
     """Task to clean up folder and remove zip files after 5 seconds"""
