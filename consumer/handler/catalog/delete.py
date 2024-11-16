@@ -3,7 +3,7 @@ from database.modals.Catalog.models import Catalog
 from config.celery_config import app
 from sqlalchemy.exc import SQLAlchemyError
 from consumer.data.error import ResponseError
-from consumer.handler.authorization.authorization import authorization_main
+# from consumer.handler.authorization.authorization import authorization_main
 from consumer.services.s3.delete import delete_catalog
 from config.redis_client import delete_cache_by_prefix
 
@@ -14,9 +14,9 @@ def handler_delete_catalog(catalog_id: str, bucket_name: str, key_main: str):
         db_gen = get_db()
         db = next(db_gen)
 
-        check_authorization = authorization_main(key_main, db)
-        if not check_authorization.verify:
-            return ResponseError(error=check_authorization.message)
+        # check_authorization = authorization_main(key_main, db)
+        # if not check_authorization.verify:
+        #     return ResponseError(error=check_authorization.message)
 
         catalog = db.query(Catalog).filter(Catalog.id == catalog_id).first()
         if not catalog:

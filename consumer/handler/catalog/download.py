@@ -3,7 +3,7 @@ from database.modals.Catalog.models import Catalog
 from config.celery_config import app
 from sqlalchemy.exc import SQLAlchemyError
 from consumer.data.error import ResponseError
-from consumer.handler.authorization.authorization import authorization_main
+# from consumer.handler.authorization.authorization import authorization_main
 from consumer.services.s3.download import download_s3_catalog
 
 from config.config_app import DOWNLOAD_FOLDER
@@ -18,9 +18,9 @@ def handler_download_catalog(catalog_id: str, bucket_name: str, key_main: str):
 
         paths = []
 
-        check_authorization = authorization_main(key_main, db)
-        if not check_authorization.verify:
-            return ResponseError(error=check_authorization.message)
+        # check_authorization = authorization_main(key_main, db)
+        # if not check_authorization.verify:
+        #     return ResponseError(error=check_authorization.message)
 
         catalog = db.query(Catalog).filter(Catalog.id == catalog_id).first()
         if not catalog:
