@@ -29,5 +29,5 @@ def handler_create_catalog(bucket_name: str, name_catalog: str, key_create: str)
             is_valid=False,
             status_code=417,
             status="ERROR",
-            data=str(e)
+            data={"error": str(e)}
         )

@@ -16,6 +16,7 @@ def create_catalog_psql(bucket_name: str, name_catalog: str, key_create: str) ->
         check_authorization = authorization_create(key_create, db)
         if not check_authorization['is_valid']:
             return ResponseData(
+                is_valid=False,
                 status="ERROR",
                 data=check_authorization['data'],
                 status_code=check_authorization['status_code'],
