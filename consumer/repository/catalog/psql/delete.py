@@ -6,7 +6,7 @@ from consumer.repository.authorization.psql.auth import authorization_main
 from consumer.services.s3.delete import delete_catalog
 
 
-def delete_catalog_psql(catalog_id: str, bucket_name: str, key_main: str):
+def delete_catalog_psql(catalog_id: str, bucket_name: str, key_main: str) -> ResponseData:
     try:
         db_gen = get_db()
         db = next(db_gen)

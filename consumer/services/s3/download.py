@@ -1,16 +1,12 @@
 import os
 from config.s3_deps import s3_auth
-from pydantic import BaseModel
-from typing import Optional
 from botocore.exceptions import ClientError
 from config.config_app import DOWNLOAD_FOLDER
+from consumer.helper.convert import get_first_and_last_folder
+from consumer.data.response import ResponseData
 
 
-class S3CatalogResponse(BaseModel):
-    error: Optional[str] = None
-
-
-def download_s3_catalog(bucket_name: str, path_catalog: str) -> S3CatalogResponse:
+def download_s3_catalog(bucket_name: str, path_catalog: str) -> ResponseData:
     try:
         s3 = s3_auth()
         response = s3.list_objects_v2(Bucket=bucket_name, Prefix=path_catalog)
@@ -26,11 +22,32 @@ def download_s3_catalog(bucket_name: str, path_catalog: str) -> S3CatalogRespons
                     os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
                     s3.download_file(bucket_name, s3_object_key, local_file_path)
 
-        else:
-            print("Brak obiektów do pobrania.")
+            return ResponseData(
+                is_valid=True,
+                status="SUCCESS",
+                status_code=200,
+                data=get_first_and_last_folder(local_folder)
+            )
 
-        return S3CatalogResponse(error=None)
+        else:
+            return ResponseData(
+                is_valid=False,
+                status="ERROR",
+                status_code=400,
+                data={"error": "no catalog for download!"}
+            )
+
     except ClientError as e:
-        return S3CatalogResponse(error=str(e))
+        return ResponseData(
+            is_valid=False,
+            status="ERROR",
+            status_code=400,
+            data={"error": str(e)}
+        )
     except Exception as e:
-        return S3CatalogResponse(error=str(e))
+        return ResponseData(
+            is_valid=False,
+            status="ERROR",
+            status_code=400,
+            data={"error": str(e)}
+        )

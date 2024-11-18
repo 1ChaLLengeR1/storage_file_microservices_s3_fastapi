@@ -5,7 +5,7 @@ from consumer.data.response import ResponseData
 from consumer.repository.authorization.psql.auth import authorization_main
 
 
-def collection_catalog_psql(name_bucket: str, key_main: str):
+def collection_catalog_psql(name_bucket: str, key_main: str) -> ResponseData:
     try:
         db_gen = get_db()
         db = next(db_gen)

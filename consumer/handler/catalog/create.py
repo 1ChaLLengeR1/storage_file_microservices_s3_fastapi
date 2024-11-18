@@ -17,6 +17,7 @@ def handler_create_catalog(bucket_name: str, name_catalog: str, key_create: str)
             )
 
         delete_cache_by_prefix("collection_catalog_")
+        delete_cache_by_prefix("catalog_")
         return ResponseData(
             is_valid=response_catalog['is_valid'],
             status_code=response_catalog['status_code'],

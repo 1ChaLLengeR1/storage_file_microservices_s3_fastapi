@@ -17,3 +17,28 @@ def path_lvl(path: str) -> int:
         return len(parts) - 1
     else:
         return 0
+
+
+import os
+
+
+def get_first_and_last_folder(path: str) -> dict:
+    normalized_path = os.path.normpath(path)
+    parts = normalized_path.split(os.sep)
+    if 'download' in parts:
+        download_index = parts.index('download')
+        relevant_parts = parts[download_index + 1:]
+    else:
+        relevant_parts = parts
+
+    if not relevant_parts:
+        return {"error": "path is None"}
+
+    first_folder = relevant_parts[0]
+    last_folder = relevant_parts[-1]
+
+    data = {
+        "global_catalog": first_folder,
+        "last_catalog": last_folder
+    }
+    return data
