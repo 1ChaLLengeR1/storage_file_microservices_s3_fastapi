@@ -1,8 +1,8 @@
 import os
 from dotenv import load_dotenv
-from config.config_app import ENV_MODE
-env_file_path = os.path.join('env', f'{ENV_MODE}.env')
+from config.config_app import ENV_MODE, BASE_DIR
 
+env_file_path = os.path.join(BASE_DIR, "env", f"{ENV_MODE}.env")
 load_dotenv(env_file_path)
 
 

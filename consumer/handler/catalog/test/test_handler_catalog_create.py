@@ -3,7 +3,6 @@ from config.celery_config import app
 from decouple import config
 from consumer.handler.catalog.create import handler_create_catalog
 from consumer.helper.random import createRandom
-from consumer.data.error import ResponseError
 from consumer.handler.catalog.data.create import HandlerCatalogResponse
 
 @app.task
@@ -15,8 +14,8 @@ def test_handler_create_catalog():
 
     response_data_catalog = handler_create_catalog(bucket_name, catalog_name, key_create)
 
-    if isinstance(response_data_catalog, ResponseError):
-        pytest.fail(f"Error from test handler create catalog: {response_data_catalog}")
+    # if isinstance(response_data_catalog, ResponseError):
+    #     pytest.fail(f"Error from test handler create catalog: {response_data_catalog}")
 
     assert isinstance(response_data_catalog,
                       HandlerCatalogResponse), "Expected HandlerCatalogResponse but got something else."
