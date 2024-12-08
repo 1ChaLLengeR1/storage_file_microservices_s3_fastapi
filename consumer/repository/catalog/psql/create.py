@@ -43,20 +43,20 @@ def create_catalog_psql(bucket_name: str, name_catalog: str, key_create: str) ->
                 continue
             else:
                 create_catalog_3 = create_catalog(bucket_name, path)
-                if create_catalog_3.error:
+                if not create_catalog_3['is_valid']:
                     return ResponseData(
-                        is_valid=False,
-                        status="ERROR",
-                        data={"error": "catalog exist in database"},
-                        status_code=400,
+                        is_valid=create_catalog_3['is_valid'],
+                        status=create_catalog_3['status'],
+                        data=create_catalog_3['data'],
+                        status_code=create_catalog_3['status_code'],
                     )
 
                 new_catalog = Catalog(
                     bucketName=bucket_name,
-                    name=createRandom(create_catalog_3.catalog_name, 10),
-                    originalName=create_catalog_3.catalog_name,
-                    path=create_catalog_3.catalog_path,
-                    url=create_catalog_3.catalog_url,
+                    name=createRandom(create_catalog_3['data']['catalog_name'], 10),
+                    originalName=create_catalog_3['data']['catalog_name'],
+                    path=create_catalog_3['data']['catalog_path'],
+                    url=create_catalog_3['data']['catalog_url'],
                     level=path_lvl(path)
                 )
 
