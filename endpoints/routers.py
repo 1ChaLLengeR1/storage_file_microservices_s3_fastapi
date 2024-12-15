@@ -7,6 +7,8 @@ DOWNLOAD_CATALOG = "/download/catalog/{id}"
 CREATE_CATALOG = "/catalog/create"
 COLLECTION_ONE_FILES = "/collection/one/files"
 
-
 # task
 TASK_ID = "/tasks/{task_id}"
+
+# test
+TEST_ROUTER = "/test"

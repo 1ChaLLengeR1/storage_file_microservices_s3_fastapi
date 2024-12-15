@@ -10,9 +10,9 @@ def authorization_create(key: str, db: Session = Depends(get_db)) -> ResponseDat
     check_main_key = authorization_main(key, db)
     if check_main_key['is_valid']:
         return ResponseData(
-            is_valid=False,
-            status_code=403,
-            data={"error": "Key is correct for main"}
+            is_valid=True,
+            status_code=200,
+            data="Key is correct for create"
         )
 
     check_keys = db.query(Keys).filter(Keys.type == "create").all()

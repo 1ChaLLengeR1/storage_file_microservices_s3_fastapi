@@ -21,7 +21,7 @@ def handler_collection_one_catalog(catalog_id: str, key_main: str):
                 data=response_collection_one['data']
             )
 
-        set_cache_data(cache_key, response_collection_one['data'])
+        set_cache_data(cache_key, response_collection_one)
         return ResponseData(
             is_valid=response_collection_one['is_valid'],
             status=response_collection_one['status'],

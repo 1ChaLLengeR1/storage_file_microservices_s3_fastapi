@@ -57,7 +57,7 @@ def test_authorization_create_main():
     try:
         check_authorization_create = authorization_create("test1", db)
         assert check_authorization_create['is_valid']
-        assert check_authorization_create['data'] == "Key is correct for main"
+        assert check_authorization_create['data'] == "Key is correct for create"
     except Exception as e:
         pytest.fail(f"Error: {e}")
     finally:

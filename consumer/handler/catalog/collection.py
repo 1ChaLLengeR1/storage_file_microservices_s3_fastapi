@@ -7,11 +7,9 @@ from consumer.data.response import ResponseData
 @app.task(serializer="pickle")
 def handler_collection_catalog(name_bucket: str, key_main: str) -> ResponseData:
     try:
-
         cache_key = f"catalog_{name_bucket}"
         cached_data = get_cache_data(cache_key)
         if cached_data:
-            print(cached_data)
             return cached_data
 
         response_collection = collection_catalog_psql(name_bucket, key_main)
