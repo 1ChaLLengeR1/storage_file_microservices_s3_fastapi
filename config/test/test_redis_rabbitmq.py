@@ -16,12 +16,11 @@ def test_rabbitmq():
 
 def test_rabbitmq_connection():
     try:
-        # Dispatch task to Celery
+
         result = test_rabbitmq.delay()
 
-        # Check if the task was successful
         if result.successful():
-            return True, result.result  # Return the result of the task
+            return True, result.result
         else:
             return False, "Task failed"
 
