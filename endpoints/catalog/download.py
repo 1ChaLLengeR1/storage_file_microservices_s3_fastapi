@@ -22,21 +22,21 @@ async def download_catalog(background_tasks: BackgroundTasks, id: str, request: 
                 status_code=400
             ).to_response()
 
-    # required_headers = ["key_main"]
-    # data_header = check_required_headers(request, required_headers)
-    # if not data_header['is_valid']:
-    #     return ResponseApiData(
-    #         status="ERROR",
-    #         data=data_header['data'],
-    #         status_code=data_header['status_code']
-    #     ).to_response()
-    #
-    # key_main = data_header['data'][0]['data']
+    required_headers = ["key_main"]
+    data_header = check_required_headers(request, required_headers)
+    if not data_header['is_valid']:
+        return ResponseApiData(
+            status="ERROR",
+            data=data_header['data'],
+            status_code=data_header['status_code']
+        ).to_response()
 
-    task = handler_download_catalog.delay(id, bucket_name, "test1")
+    key_main = data_header['data'][0]['data']
+
+    task = handler_download_catalog.delay(id, bucket_name, key_main)
     timeout = 10
     start_time = time.time()
-    response = await response_data(background_tasks, task, timeout, start_time)
+    response = await response_data(background_tasks, task, timeout, start_time, True)
 
     if response['is_valid'] and response['status'] == "SUCCESS":
         zip_file_path = response['data']['zip_file_path']
