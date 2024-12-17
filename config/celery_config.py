@@ -22,7 +22,7 @@ app.conf.update(
         'consumer.services.s3.collection', 'consumer.services.s3.create',
         'consumer.handler.catalog.create',
         'consumer.handler.catalog.collection', 'consumer.handler.catalog.collection_one',
-        'consumer.handler.catalog.delete', 'consumer.handler.catalog.download'),
+        'consumer.handler.catalog.delete', 'consumer.handler.catalog.download', 'consumer.handler.files.upload'),
     accept_content=['application/json', 'json', 'pickle'],
     result_serializer='pickle',
     broker_connection_retry_on_startup=True,

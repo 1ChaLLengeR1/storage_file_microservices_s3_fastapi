@@ -1,5 +1,5 @@
-from fastapi import APIRouter, BackgroundTasks, Request, Response
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi import APIRouter, BackgroundTasks, Request
+from fastapi.responses import FileResponse
 from endpoints.routers import DOWNLOAD_CATALOG
 from consumer.handler.catalog.download import handler_download_catalog
 from endpoints.response import response_data
