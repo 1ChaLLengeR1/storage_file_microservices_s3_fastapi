@@ -5,6 +5,7 @@ from endpoints.response import response_data
 import time
 from consumer.helper.header import check_required_headers
 from consumer.data.response import ResponseApiData
+from consumer.helper.files import save_files_tmp
 
 router = APIRouter()
 
@@ -15,7 +16,7 @@ async def upload_files(
         request: Request,
         name_bucket: str,
         catalog_id: str = Form(...),
-        files: list[UploadFile] = File(...),
+        file: list[UploadFile] = File(...),
 ):
     required_headers = ["key_create"]
     data_header = check_required_headers(request, required_headers)
@@ -28,7 +29,9 @@ async def upload_files(
 
     key_create = data_header['data'][0]['data']
 
-    task = handler_upload_file.delay(name_bucket, catalog_id, key_create, files)
+    response_save_files = save_files_tmp(file)
+
+    task = handler_upload_file.delay(name_bucket, catalog_id, key_create, response_save_files)
     timeout = 10
     start_time = time.time()
     response = await response_data(background_tasks, task, timeout, start_time, True)

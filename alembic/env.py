@@ -6,6 +6,7 @@ from database.database import Base
 # Importuj swoje modele
 from database.modals.Catalog.models import Catalog
 from database.modals.Keys.models import Keys
+from database.modals.File.models import File
 
 config = context.config
 

@@ -11,7 +11,13 @@ run_test:
 	pytest -r w
 
 run_worker:
-	celery -A config.celery_config.app worker -P eventlet --loglevel=info
+	celery -A config.celery_config.app worker --concurrency=4 -P eventlet --loglevel=info
+
+run_flower:
+	celery -A config.celery_config.app flower --basic_auth=admin:admin
+
+run_worker_status:
+	celery -A config.celery_config.app status
 
 run_app:
 	uvicorn main:app --reload --log-level debug --port 7000

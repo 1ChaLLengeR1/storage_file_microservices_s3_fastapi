@@ -1,5 +1,5 @@
-from fastapi import UploadFile
 from consumer.data.response import ResponseData
+from pathlib import Path
 
 ALLOWED_FORMATS = {
     "jpg", "jpeg", "png", "gif", "webp", "svg",
@@ -8,14 +8,11 @@ ALLOWED_FORMATS = {
 }
 
 
-def validate_file_extensions(files: list[UploadFile]) -> ResponseData:
+def validate_file_extensions(files: list[str]) -> ResponseData:
     try:
         invalid_files = []
-        for file in files:
-            file_name = file.filename
-            if not file_name:
-                continue
-
+        for file_path in files:
+            file_name = Path(file_path).name
             file_extension = file_name.split('.')[-1].lower()
 
             if file_extension not in ALLOWED_FORMATS:
