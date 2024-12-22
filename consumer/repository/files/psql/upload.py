@@ -2,6 +2,7 @@ from consumer.data.response import ResponseData
 from database.database import get_db
 from consumer.repository.authorization.psql.auth import authorization_create
 from database.modals.Catalog.models import Catalog
+from database.modals.File.models import File
 from sqlalchemy.exc import SQLAlchemyError
 from consumer.services.s3.create import upload_file
 from consumer.helper.files import clear_tmp_files
@@ -12,6 +13,7 @@ def upload_file_psql(bucket_name: str, catalog_id: str, key_create: str, files: 
 
         db_gen = get_db()
         db = next(db_gen)
+        created_files = []
 
         check_authorization = authorization_create(key_create, db)
         if not check_authorization['is_valid']:
@@ -42,18 +44,43 @@ def upload_file_psql(bucket_name: str, catalog_id: str, key_create: str, files: 
 
         clear_tmp_files(files)
 
-        
+        for file in response_upload['data']:
+            new_file = File(
+                catalog_id=catalog_id,
+                mime_type=file['mime_type'],
+                file_name=file['file_name'],
+                original_name=file['original_name'],
+                file_size=file['file_size'],
+                s3_url=file['s3_url'],
+                s3_path=file['s3_path']
+            )
 
+            db.add(new_file)
+            db.commit()
+            db.refresh(new_file)
+            created_files.append(new_file)
 
-        data = {
-            "id": catalog_records.id
-        }
+        files_data = [
+            {
+                "id": file.id,
+                "catalog_id": file.catalog_id,
+                "mime_type": file.mime_type,
+                "file_name": file.file_name,
+                "original_name": file.original_name,
+                "file_size": file.file_size,
+                "s3_url": file.s3_url,
+                "s3_path": file.s3_path,
+                "createUp": str(file.createUp),
+                "updateUp": str(file.updateUp),
+            }
+            for file in created_files
+        ]
 
         return ResponseData(
             is_valid=True,
             status="SUCCESS",
             status_code=200,
-            data=data
+            data=files_data
         )
 
     except SQLAlchemyError as e:

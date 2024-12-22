@@ -5,7 +5,7 @@ migration_down:
 	alembic downgrade base
 
 migration_revision:
-	alembic revision --autogenerate -m "new tables"
+	alembic revision --autogenerate -m "init"
 
 run_test:
 	pytest -r w

@@ -13,7 +13,9 @@ app.autodiscover_tasks([
     'consumer.handler.catalog.collection',
     'consumer.handler.catalog.delete',
     'consumer.handler.files.upload',
+    'consumer.handler.files.collection',
     'endpoints.files.upload',
+    'endpoints.files.delete'
 ], force=True)
 
 # Konfiguracja Celery
@@ -26,7 +28,7 @@ app.conf.update(
         'consumer.handler.catalog.create', 'consumer.handler.catalog.collection',
         'consumer.handler.catalog.collection_one', 'consumer.handler.catalog.delete',
         'consumer.handler.catalog.download', 'consumer.handler.files.upload',
-        'endpoints.files.upload'
+        'endpoints.files.upload', 'consumer.handler.files.collection', 'endpoints.files.delete'
     ),
     accept_content=['application/json', 'pickle'],
     result_serializer='pickle',

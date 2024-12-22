@@ -4,6 +4,7 @@ from consumer.data.response import ResponseData
 from sqlalchemy.exc import SQLAlchemyError
 from consumer.repository.authorization.psql.auth import authorization_main
 from consumer.services.s3.delete import delete_catalog
+from consumer.repository.files.psql.delete import delete_files_all
 
 
 def delete_catalog_psql(catalog_id: str, bucket_name: str, key_main: str) -> ResponseData:
@@ -45,6 +46,23 @@ def delete_catalog_psql(catalog_id: str, bucket_name: str, key_main: str) -> Res
             for catalog in related_catalogs
         ]
 
+        catalog_delete = []
+
+        for file in serialized_catalogs:
+            response_delete_files = delete_files_all(file['id'])
+            if not response_delete_files['is_valid']:
+                return ResponseData(
+                    is_valid=response_delete_files['is_valid'],
+                    status=response_delete_files['status'],
+                    status_code=response_delete_files['status_code'],
+                    data=response_delete_files['data']
+                )
+            new_obj = {
+                "catalog_instance": file,
+                "files": response_delete_files['data']
+            }
+            catalog_delete.append(new_obj)
+
         unique_levels = {cat.level for cat in related_catalogs}
         min_level = min(unique_levels, default=None)
 
@@ -66,7 +84,7 @@ def delete_catalog_psql(catalog_id: str, bucket_name: str, key_main: str) -> Res
             is_valid=True,
             status="SUCCESS",
             status_code=200,
-            data=serialized_catalogs
+            data=catalog_delete
         )
 
     except SQLAlchemyError as e:
