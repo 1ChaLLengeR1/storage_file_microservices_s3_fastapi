@@ -1,12 +1,23 @@
 from config.celery_config import app
 from consumer.data.response import ResponseData
 from consumer.repository.files.psql.upload import upload_file_psql
+from consumer.helper.validators import is_valid_uuid
 from consumer.repository.files.psql.helper import validate_file_extensions
 
 
 @app.task(serializer='pickle')
 def handler_upload_file(bucket_name: str, catalog_id: str, key_create: str, files: list[str]) -> ResponseData:
     try:
+
+        check_uuid = is_valid_uuid(catalog_id)
+        if not check_uuid:
+            return ResponseData(
+                is_valid=False,
+                status="ERROR",
+                data="invalid uuid format",
+                status_code=400
+            )
+
         if len(files) == 0:
             return ResponseData(
                 is_valid=False,
@@ -44,6 +55,6 @@ def handler_upload_file(bucket_name: str, catalog_id: str, key_create: str, file
         return ResponseData(
             is_valid=False,
             status="ERROR",
-            status_code=417,
+            status_code=500,
             data={"error": str(e)}
         )

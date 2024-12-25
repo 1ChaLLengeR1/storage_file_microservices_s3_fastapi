@@ -10,6 +10,7 @@ from endpoints.task import router as task_router
 from endpoints.files.upload import router as upload_files
 from endpoints.files.collection import router as collection_files
 from endpoints.files.delete import router as delete_files
+from endpoints.files.collection_one import router as collection_one_file
 
 api_router = APIRouter()
 
@@ -22,4 +23,5 @@ api_router.include_router(catalog_collection_one_router)
 api_router.include_router(task_router)
 api_router.include_router(upload_files)
 api_router.include_router(collection_files)
+api_router.include_router(collection_one_file)
 api_router.include_router(delete_files)

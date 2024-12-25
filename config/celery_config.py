@@ -14,6 +14,7 @@ app.autodiscover_tasks([
     'consumer.handler.catalog.delete',
     'consumer.handler.files.upload',
     'consumer.handler.files.collection',
+    'consumer.handler.files.collection_one',
     'endpoints.files.upload',
     'endpoints.files.delete'
 ], force=True)
@@ -28,15 +29,14 @@ app.conf.update(
         'consumer.handler.catalog.create', 'consumer.handler.catalog.collection',
         'consumer.handler.catalog.collection_one', 'consumer.handler.catalog.delete',
         'consumer.handler.catalog.download', 'consumer.handler.files.upload',
-        'endpoints.files.upload', 'consumer.handler.files.collection', 'endpoints.files.delete'
+        'endpoints.files.upload', 'consumer.handler.files.collection', 'endpoints.files.delete',
+        'consumer.handler.files.collection_one'
     ),
     accept_content=['application/json', 'pickle'],
     result_serializer='pickle',
     task_serializer='pickle',
     broker_connection_retry_on_startup=True,
-    task_default_retry_delay=60,
+    task_default_retry_delay=10,
     task_max_retries=3,
-    task_time_limit=600,
-    task_soft_time_limit=540,
-    worker_prefetch_multiplier=1,
+    worker_prefetch_multiplier=2,
 )

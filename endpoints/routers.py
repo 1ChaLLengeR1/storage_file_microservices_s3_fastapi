@@ -10,6 +10,7 @@ COLLECTION_ONE_FILES = "/collection/one/files"
 # files
 UPLOAD_FILES = "/files/upload/{name_bucket}"
 COLLECTION_FILES = "/files/collection/{catalog_id}"
+COLLECTION_ONE_FILE = "/files/collection/one/{file_id}"
 DELETE_FILES = "/files/delete/{name_bucket}"
 
 # task

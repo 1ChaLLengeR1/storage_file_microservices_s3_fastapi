@@ -5,7 +5,7 @@ from database.modals.File.models import File
 from sqlalchemy.exc import SQLAlchemyError
 
 
-def collection_files_psql(catalog_id: str, key_main: str) -> ResponseData:
+def collection_one_file_psql(file_id: str, key_main: str) -> ResponseData:
     try:
         db_gen = get_db()
         db = next(db_gen)
@@ -19,28 +19,33 @@ def collection_files_psql(catalog_id: str, key_main: str) -> ResponseData:
                 status_code=check_authorization['status_code'],
             )
 
-        rows_files = db.query(File).filter(File.catalog_id == catalog_id).all()
+        row_file = db.query(File).filter(File.id == file_id).first()
+        if not row_file:
+            return ResponseData(
+                is_valid=False,
+                status="ERROR",
+                data={"error": f"Not found file with this id: {file_id}"},
+                status_code=400,
+            )
 
-        files_data = [
-            {
-                "id": file.id,
-                "catalog_id": file.catalog_id,
-                "mime_type": file.mime_type,
-                "file_name": file.file_name,
-                "original_name": file.original_name,
-                "file_size": file.file_size,
-                "s3_url": file.s3_url,
-                "s3_path": file.s3_path,
-            }
-            for file in rows_files
-        ]
+        file_obj = {
+            "id": row_file.id,
+            "catalog_id": row_file.catalog_id,
+            "mime_type": row_file.mime_type,
+            "file_name": row_file.file_name,
+            "original_name": row_file.original_name,
+            "file_size": row_file.file_size,
+            "s3_url": row_file.s3_url,
+            "s3_path": row_file.s3_path,
+        }
 
         return ResponseData(
             is_valid=True,
             status="SUCCESS",
             status_code=200,
-            data=files_data
+            data=file_obj
         )
+
     except SQLAlchemyError as e:
         return ResponseData(
             is_valid=False,

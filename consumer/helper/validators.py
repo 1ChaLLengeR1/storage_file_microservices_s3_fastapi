@@ -9,7 +9,7 @@ load_dotenv(env_file_path)
 
 def is_valid_uuid(val: str) -> bool:
     try:
-        uuid.UUID(val)  # Próbujemy zamienić na UUID
+        uuid.UUID(val)
         return True
     except ValueError:
         return False

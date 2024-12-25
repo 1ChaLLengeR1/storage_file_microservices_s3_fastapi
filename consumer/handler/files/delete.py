@@ -8,9 +8,7 @@ from consumer.helper.validators import is_valid_uuid
 def handler_delete_files(bucket_name: str, list_id: list[str], key_delete: str) -> ResponseData:
     try:
 
-        print(list_id)
         for idx, file_id in enumerate(list_id):
-            print(idx)
             if not is_valid_uuid(file_id):
                 return ResponseData(
                     is_valid=False,
@@ -37,6 +35,6 @@ def handler_delete_files(bucket_name: str, list_id: list[str], key_delete: str) 
         return ResponseData(
             is_valid=False,
             status="ERROR",
-            status_code=417,
+            status_code=500,
             data={"error": str(e)}
         )
