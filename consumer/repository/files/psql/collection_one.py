@@ -6,9 +6,9 @@ from sqlalchemy.exc import SQLAlchemyError
 
 
 def collection_one_file_psql(file_id: str, key_main: str) -> ResponseData:
+    db_gen = get_db()
+    db = next(db_gen)
     try:
-        db_gen = get_db()
-        db = next(db_gen)
 
         check_authorization = authorization_main(key_main, db)
         if not check_authorization['is_valid']:

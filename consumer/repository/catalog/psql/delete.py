@@ -8,9 +8,9 @@ from consumer.repository.files.psql.delete import delete_files_all
 
 
 def delete_catalog_psql(catalog_id: str, bucket_name: str, key_main: str) -> ResponseData:
+    db_gen = get_db()
+    db = next(db_gen)
     try:
-        db_gen = get_db()
-        db = next(db_gen)
 
         check_authorization = authorization_main(key_main, db)
         if not check_authorization['is_valid']:

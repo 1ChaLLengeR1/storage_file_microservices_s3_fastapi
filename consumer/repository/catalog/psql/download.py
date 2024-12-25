@@ -4,14 +4,14 @@ from sqlalchemy.exc import SQLAlchemyError
 from consumer.repository.authorization.psql.auth import authorization_main
 from database.modals.Catalog.models import Catalog
 from config.config_app import DOWNLOAD_FOLDER
-from consumer.helper.files import clear_folders_and_zips, zip_catalog
+from consumer.helper.files import zip_catalog
 from consumer.services.s3.download import download_s3_catalog
 
 
 def download_catalog_psql(catalog_id: str, bucket_name: str, key_main: str) -> ResponseData:
+    db_gen = get_db()
+    db = next(db_gen)
     try:
-        db_gen = get_db()
-        db = next(db_gen)
         paths = []
 
         check_authorization = authorization_main(key_main, db)

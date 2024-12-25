@@ -7,9 +7,9 @@ from consumer.services.s3.delete import delete_files
 
 
 def delete_files_psql(bucket_name: str, list_id: list[str], key_delete: str) -> ResponseData:
+    db_gen = get_db()
+    db = next(db_gen)
     try:
-        db_gen = get_db()
-        db = next(db_gen)
 
         check_authorization = authorization_delete(key_delete, db)
         if not check_authorization['is_valid']:
@@ -79,9 +79,9 @@ def delete_files_psql(bucket_name: str, list_id: list[str], key_delete: str) -> 
 
 
 def delete_files_all(catalog_id: str) -> ResponseData:
+    db_gen = get_db()
+    db = next(db_gen)
     try:
-        db_gen = get_db()
-        db = next(db_gen)
 
         rows_files = db.query(File).filter(File.catalog_id == catalog_id).all()
 

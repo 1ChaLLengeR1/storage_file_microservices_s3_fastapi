@@ -9,9 +9,9 @@ from consumer.repository.authorization.psql.auth import authorization_create
 
 
 def create_catalog_psql(bucket_name: str, name_catalog: str, key_create: str) -> ResponseData:
+    db_gen = get_db()
+    db = next(db_gen)
     try:
-        db_gen = get_db()
-        db = next(db_gen)
 
         check_authorization = authorization_create(key_create, db)
         if not check_authorization['is_valid']:

@@ -9,10 +9,9 @@ from consumer.helper.files import clear_tmp_files
 
 
 def upload_file_psql(bucket_name: str, catalog_id: str, key_create: str, files: list[str]) -> ResponseData:
+    db_gen = get_db()
+    db = next(db_gen)
     try:
-
-        db_gen = get_db()
-        db = next(db_gen)
         created_files = []
 
         check_authorization = authorization_create(key_create, db)

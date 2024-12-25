@@ -1,3 +1,6 @@
+import os
+
+
 def original_name_from_path(path: str) -> str:
     if path.endswith('/'):
         path = path[:-1]
@@ -17,9 +20,6 @@ def path_lvl(path: str) -> int:
         return len(parts) - 1
     else:
         return 0
-
-
-import os
 
 
 def get_first_and_last_folder(path: str) -> dict:

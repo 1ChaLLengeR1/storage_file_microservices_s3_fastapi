@@ -48,6 +48,35 @@ def download_s3_catalog(bucket_name: str, path_catalog: str) -> ResponseData:
         return ResponseData(
             is_valid=False,
             status="ERROR",
+            status_code=417,
+            data={"error": str(e)}
+        )
+
+
+def download_s3_file(bucket_name: str, name_file: str, path_file: str) -> ResponseData:
+    try:
+        s3 = s3_auth()
+        local_file_path = os.path.join(DOWNLOAD_FOLDER, name_file)
+        s3.download_file(bucket_name, path_file, local_file_path)
+
+        return ResponseData(
+            is_valid=True,
+            status="SUCCESS",
+            status_code=200,
+            data=name_file
+        )
+
+    except ClientError as e:
+        return ResponseData(
+            is_valid=False,
+            status="ERROR",
             status_code=400,
+            data={"error": str(e)}
+        )
+    except Exception as e:
+        return ResponseData(
+            is_valid=False,
+            status="ERROR",
+            status_code=417,
             data={"error": str(e)}
         )
