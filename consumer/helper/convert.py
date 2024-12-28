@@ -22,6 +22,23 @@ def path_lvl(path: str) -> int:
         return 0
 
 
+def analyze_folder_size(folder_size_b: int | None) -> str:
+    if folder_size_b is None or folder_size_b <= 0:
+        return "0.00 KB"
+
+    folder_size_mb = folder_size_b / (1024 * 1024)
+
+    if folder_size_mb < 1024:
+        return f"{folder_size_mb:.2f} MB"
+
+    folder_size_gb = folder_size_mb / 1024
+    if folder_size_gb < 1024:
+        return f"{folder_size_gb:.2f} GB"
+
+    folder_size_tb = folder_size_gb / 1024
+    return f"{folder_size_tb:.2f} TB"
+
+
 def get_first_and_last_folder(path: str) -> dict:
     normalized_path = os.path.normpath(path)
     parts = normalized_path.split(os.sep)

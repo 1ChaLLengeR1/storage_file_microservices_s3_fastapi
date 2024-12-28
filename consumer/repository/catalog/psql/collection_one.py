@@ -1,8 +1,12 @@
 from database.modals.Catalog.models import Catalog
-from sqlalchemy.exc import SQLAlchemyError
+from database.modals.File.models import File
 from database.database import get_db
 from consumer.data.response import ResponseData
 from consumer.repository.authorization.psql.auth import authorization_main
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import func
+from sqlalchemy import INTEGER
+from consumer.helper.convert import analyze_folder_size
 
 
 def collection_one_catalog_psql(catalog_id: str, key_main: str) -> ResponseData:
@@ -30,16 +34,28 @@ def collection_one_catalog_psql(catalog_id: str, key_main: str) -> ResponseData:
         sub_catalogs = db.query(Catalog).filter(Catalog.path.like(f"{data.path}%"),
                                                 Catalog.level == data.level + 1).all()
 
-        sub_catalog_list = [
-            {
+        sub_catalog_list = []
+        for sub in sub_catalogs:
+            sum_query = (
+                db.query(func.sum(File.file_size.cast(INTEGER)).label("total_file_size"))
+                .filter(File.catalog_id == sub.id)
+                .scalar()
+            )
+
+            sub_catalog_list.append({
                 "id": sub.id,
                 "level": sub.level,
                 "originalName": sub.originalName,
                 "path": sub.path,
+                "size_catalog": analyze_folder_size(sum_query),
                 "url": sub.url
-            }
-            for sub in sub_catalogs
-        ]
+            })
+
+        sum_query = (
+            db.query(func.sum(File.file_size.cast(INTEGER)).label("total_file_size"))
+            .filter(File.catalog_id == data.id)
+            .scalar()
+        )
 
         result = {
             "id": data.id,
@@ -49,6 +65,7 @@ def collection_one_catalog_psql(catalog_id: str, key_main: str) -> ResponseData:
             "level": data.level,
             "path": data.path,
             "url": data.url,
+            "size_catalog": analyze_folder_size(sum_query),
             "sub_catalogs": sub_catalog_list
         }
 

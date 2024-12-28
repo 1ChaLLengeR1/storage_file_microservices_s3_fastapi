@@ -15,7 +15,7 @@ app.autodiscover_tasks([
     'consumer.handler.files.upload',
     'consumer.handler.files.collection',
     'consumer.handler.files.collection_one',
-    'consumer.handler.files.download'
+    'consumer.handler.files.download',
 ], force=True)
 
 # Konfiguracja Celery
@@ -35,7 +35,5 @@ app.conf.update(
     result_serializer='pickle',
     task_serializer='pickle',
     broker_connection_retry_on_startup=True,
-    task_default_retry_delay=10,
-    task_max_retries=3,
     worker_prefetch_multiplier=2,
 )

@@ -13,6 +13,7 @@ COLLECTION_FILES = "/files/collection/{catalog_id}"
 COLLECTION_ONE_FILE = "/files/collection/one/{file_id}"
 DELETE_FILES = "/files/delete/{name_bucket}"
 DOWNLOAD_FILE = "/download/file/{file_id}"
+CREATE_UPLOAD = "/files/create/{name_bucket}"
 
 # task
 TASK_ID = "/tasks/{task_id}"

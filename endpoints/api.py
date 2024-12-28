@@ -11,6 +11,7 @@ from endpoints.files.collection import router as collection_files
 from endpoints.files.delete import router as delete_files
 from endpoints.files.collection_one import router as collection_one_file
 from endpoints.files.download import router as download_file
+from endpoints.files.upload import router as handler_create_upload
 
 api_router = APIRouter()
 
@@ -25,3 +26,4 @@ api_router.include_router(collection_files)
 api_router.include_router(collection_one_file)
 api_router.include_router(delete_files)
 api_router.include_router(download_file)
+api_router.include_router(handler_create_upload)

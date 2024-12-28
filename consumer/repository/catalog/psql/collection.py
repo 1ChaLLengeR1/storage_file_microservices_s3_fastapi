@@ -1,8 +1,12 @@
 from database.modals.Catalog.models import Catalog
-from sqlalchemy.exc import SQLAlchemyError
+from database.modals.File.models import File
 from database.database import get_db
 from consumer.data.response import ResponseData
 from consumer.repository.authorization.psql.auth import authorization_main
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import func
+from sqlalchemy import INTEGER
+from consumer.helper.convert import analyze_folder_size
 
 
 def collection_catalog_psql(name_bucket: str, key_main: str) -> ResponseData:
@@ -45,6 +49,12 @@ def collection_catalog_psql(name_bucket: str, key_main: str) -> ResponseData:
                     }
                 current_node = current_node[part]["subfolders"]
 
+            sum_query = (
+                db.query(func.sum(File.file_size.cast(INTEGER)).label("total_file_size"))
+                .filter(File.catalog_id == entry.id)
+                .scalar()
+            )
+
             folder_name = parts[-1]
             current_node[folder_name] = {
                 "id": entry.id,
@@ -54,6 +64,7 @@ def collection_catalog_psql(name_bucket: str, key_main: str) -> ResponseData:
                 "path": entry.path,
                 "url": entry.url,
                 "level": entry.level,
+                "size_catalog": analyze_folder_size(sum_query),
                 "subfolders": {}
             }
 

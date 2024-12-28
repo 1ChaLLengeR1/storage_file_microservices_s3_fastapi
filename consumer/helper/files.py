@@ -31,6 +31,14 @@ def save_files_tmp(upload_files: List[UploadFile]) -> List[str] | dict:
         return {"error": str(e)}
 
 
+def check_files_size(upload_files: List[UploadFile]) -> int:
+    sum_size = 0
+    for upload_file in upload_files:
+        sum_size += upload_file.size
+
+    return sum_size
+
+
 def clear_tmp_files(file_paths: List[str]) -> bool:
     try:
         for file_path in file_paths:
