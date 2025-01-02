@@ -1,5 +1,4 @@
 import pytest
-from config.celery_config import app
 from decouple import config
 from consumer.repository.catalog.psql.collection import collection_catalog_psql
 from consumer.repository.catalog.psql.collection_one import collection_one_catalog_psql
@@ -7,7 +6,6 @@ from consumer.repository.catalog.psql.create import create_catalog_psql
 from consumer.helper.random import createRandom
 
 
-@app.task
 def test_collection_catalog_psql():
     catalog_name = createRandom("test")
     bucket_name = config("AWS_BUCKET_NAME")
@@ -26,7 +24,7 @@ def test_collection_catalog_psql():
 
     print("Test collection_catalog_psql passed!")
 
-@app.task
+
 def test_collection_one_catalog_psql():
     catalog_name = createRandom("test")
     bucket_name = config("AWS_BUCKET_NAME")

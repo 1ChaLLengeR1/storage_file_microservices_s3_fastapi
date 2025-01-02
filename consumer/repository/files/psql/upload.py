@@ -8,7 +8,8 @@ from consumer.services.s3.create import upload_file
 from consumer.helper.files import clear_tmp_files
 
 
-def upload_file_psql(bucket_name: str, catalog_id: str, key_create: str, files: list[str]) -> ResponseData:
+def upload_file_psql(bucket_name: str, catalog_id: str, key_create: str, files: list[str],
+                     remove_one: bool = True) -> ResponseData:
     db_gen = get_db()
     db = next(db_gen)
     try:
@@ -40,8 +41,8 @@ def upload_file_psql(bucket_name: str, catalog_id: str, key_create: str, files: 
                 data=response_upload['data'],
                 status_code=response_upload['status_code'],
             )
-
-        clear_tmp_files(files)
+        if remove_one:
+            clear_tmp_files(files)
 
         for file in response_upload['data']:
             new_file = File(

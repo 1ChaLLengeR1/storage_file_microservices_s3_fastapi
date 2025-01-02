@@ -69,7 +69,16 @@ def zip_catalog(catalog_dir: Path):
         return {"error": str(e)}
 
 
-def clear_folders_and_zips(directory, all_catalog: bool = False):
+def check_catalog_is_empty(directory: str) -> bool:
+    if not os.path.isdir(directory):
+        raise ValueError(f"Podana ścieżka nie jest katalogiem: {directory}")
+
+    contents = [item for item in os.listdir(directory) if not item.startswith('.')]
+    print(len(contents) == 0)
+    return len(contents) == 0
+
+
+def clear_folders_and_zips(directory: str, all_catalog: bool = False):
     if not os.path.isdir(directory):
         return
 
