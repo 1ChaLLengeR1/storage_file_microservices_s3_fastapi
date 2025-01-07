@@ -5,7 +5,7 @@ from consumer.helper.random import createRandom
 from consumer.repository.catalog.psql.create import create_catalog_psql
 from consumer.repository.catalog.psql.download import download_catalog_psql
 from consumer.repository.files.psql.upload import upload_file_psql
-from config.config_app import IMG1, IMG2, IMG3, IMG4, ZIP1
+from config.config_app import IMG1, IMG2, IMG3, IMG4
 from consumer.helper.files import check_catalog_is_empty, clear_folders_and_zips
 from config.config_app import DOWNLOAD_FOLDER
 
