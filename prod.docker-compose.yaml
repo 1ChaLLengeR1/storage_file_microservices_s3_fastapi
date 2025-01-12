@@ -12,20 +12,21 @@ services:
     image: rabbitmq:3-management
     ports:
       - "15672:15672"
-    expose:
-      - "15672"
+      - "5672:5672"
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - .:/app
 
   celery_worker_microservice:
     build:
       context: .
       dockerfile: Dockerfiles/dev.dockerfile
     env_file:
-      - env/prod.env
+     - env/prod.env
     environment:
-      REDIS_HOST: 'redis'
+      REDIS_HOST: 'redis_backend_microservice'
       REDIS_PORT: '6379'
       BROKER_URL: ${BROKER}
       RESULT_BACKEND: ${BACKEND}
@@ -35,6 +36,9 @@ services:
     command: [ "celery", "-A", "config.celery_config.app", "worker", "-P", "eventlet", "--loglevel=info" ]
     volumes:
       - .:/app
+    depends_on:
+      - rabbitmq_backend_microservice
+      - redis_backend_microservice
 
   fastapi_backend_microservice:
     build:
@@ -45,7 +49,7 @@ services:
     env_file:
       - env/prod.env
     environment:
-      REDIS_HOST: 'redis'
+      REDIS_HOST: 'redis_backend_microservice'
       REDIS_PORT: '6379'
     volumes:
       - .:/app

@@ -62,7 +62,7 @@ services:
     env_file:
       - env/dev.env
     environment:
-      REDIS_HOST: 'redis'
+      REDIS_HOST: 'redis_backend_microservice'
       REDIS_PORT: '6379'
     volumes:
       - .:/app
