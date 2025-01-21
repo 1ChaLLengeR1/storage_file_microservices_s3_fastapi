@@ -1,7 +1,6 @@
 #!/bin/bash
 
 set -e
-set -x  # Debugowanie - wyświetla każdą komendę przed wykonaniem
 
 APP_VERSION=$1
 
@@ -10,7 +9,7 @@ if [ -z "$APP_VERSION" ]; then
   exit 1
 fi
 
-LOG_FILE="../deploy.log"  # Plik logów w katalogu nadrzędnym
+LOG_FILE="../deploy.log"
 
 echo ">>> Ubijanie kontenerów (jeśli istnieją)..."
 sudo docker-compose --env-file ../env/prod.env -f ../prod.docker-compose.yaml down
@@ -29,5 +28,4 @@ DEPLOY_MESSAGE="Wdrożenie zakończone pomyślnie. Wersja: $APP_VERSION, Data: $
 
 echo ">>> $DEPLOY_MESSAGE"
 
-# Dodanie loga do pliku
 echo "$DEPLOY_MESSAGE" >> "$LOG_FILE"
