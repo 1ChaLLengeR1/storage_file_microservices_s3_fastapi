@@ -1,11 +1,14 @@
+install_dependencies:
+	pip install -r requirements.txt
+
+migration_revision:
+	alembic revision --autogenerate -m "init"
+
 migration_up:
 	alembic upgrade head
 
 migration_down:
 	alembic downgrade base
-
-migration_revision:
-	alembic revision --autogenerate -m "init"
 
 run_test:
 	pytest -r w

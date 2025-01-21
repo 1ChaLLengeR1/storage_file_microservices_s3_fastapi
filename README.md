@@ -24,3 +24,21 @@ Translated with DeepL.com (free version)
 - AWS S3 Bucket
 - PostgreSQL
 - Docker
+
+# Installation
+###### If you want the application to run then you need to create a database in your database with your name and add the url in the alembic.ini file. Look for the key “sqlalchemy.url”. Then you need to fill in the ./env.example/dev.env.example folder (remove the .example) with the data to run your application, as it is needed for the application to run properly. You can run applications in several ways. The first is through Docker, and the second is by manually running services on your machine, i.e. redis, rabbitmq. These services need to walk on your machine to run locally without docker.
+
+# Makefile for help commends
+- install_dependencies: Installs the necessary dependencies to run the application
+- migration_revision: If you have a well configured link in alembic.ini with the url to the database then this command builds tables in the database and creates migrations init
+- migration_up: migrates tables to the database
+- migration_down: beats tables in the database
+- run_test: Starts all tests. There are about 20 of them.
+- run_worker: Launches worker for work
+- run_flower: Launches additional gui for celery task previews 
+- run_worker_status: worker status preview
+- run_app: Launching the main fastapi application
+
+# Scripts
+- ./scripts/deploy.sh: Starts building applications in production.
+- ./scripts/developer.sh: Runs the entire backend for the developer using docker for tools such as fastapi, celery_worker, postgresql, rabbitmq and redis
