@@ -13,9 +13,7 @@
 
 # What the project presents:
 ###### The project is made with the idea to use it in each subsequent project, because each project has sections with updating files or acting on them. When creating such a project, I thought about how it would be used in future projects.
-
-Translated with DeepL.com (free version)
-
+-
 # Technologies:
 - FastAPI - Python
 - Celery
